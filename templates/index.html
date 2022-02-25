@@ -1,0 +1,18 @@
+<html>
+
+<head>
+	<link rel="stylesheet" href={{ url_for('static', filename='style.css' ) }} />
+</head>
+
+<body>
+	<h1>Movie Explorer</h1>
+	<h2>{{title}}</h2>
+	<h3>{{tagline}}</h3>
+	<p>Genres: {{genre}}</p>
+	<div>
+		<img src="{{poster_image}}" width=500 height=700 />
+	</div>
+	<a href="{{wiki_url}}"> Click here to see Wikipedia page! </a>
+</body>
+
+</html>
