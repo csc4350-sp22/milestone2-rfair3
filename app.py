@@ -7,6 +7,7 @@ import base64
 from wikipedia import get_wiki_link
 from tmdb import get_movie_data
 
+
 app = flask.Flask(__name__)
 
 
@@ -17,6 +18,18 @@ MOVIE_IDS = [
     5174, 
     16555
 ]
+
+
+@app.route("/login")
+def login():
+    return flask.render_template("login.html")
+    
+
+@app.route("/register")
+def register():
+    return flask.render_template("register.html")
+    
+
 
 
 @app.route("/")
