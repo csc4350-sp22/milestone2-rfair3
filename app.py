@@ -1,14 +1,14 @@
-import flask
 import requests
 import os
 import random
 import base64
 
+from flask import Flask, render_template, url_for
 from wikipedia import get_wiki_link
 from tmdb import get_movie_data
 
 
-app = flask.Flask(__name__)
+app = Flask(__name__)
 
 
 MOVIE_IDS = [
@@ -22,14 +22,17 @@ MOVIE_IDS = [
 
 @app.route("/login")
 def login():
-    return flask.render_template("login.html")
+    return render_template("login.html")
     
 
 @app.route("/register")
 def register():
-    return flask.render_template("register.html")
+    return render_template("register.html")
     
-
+@app.route("/home")
+def home():
+    return render_template("home.html")
+    
 
 
 @app.route("/")
@@ -40,7 +43,7 @@ def index():
     (title, tagline, genre, poster_image) = get_movie_data(movie_id)
     wikipedia_url = get_wiki_link(title)
 
-    return flask.render_template(
+    return render_template(
         "index.html",
         title=title,
         tagline=tagline,
