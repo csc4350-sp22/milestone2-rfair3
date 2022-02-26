@@ -16,10 +16,15 @@ from wikipedia import get_wiki_link
 from tmdb import get_movie_data
 
 
+
+
 app = Flask(__name__)
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db' 
+
+
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'thisisasecretkey'
 
 
@@ -37,7 +42,7 @@ def load_user(user_id):
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), nullable=False, unique=True)
-    password = db.Column(db.String(80), nullable=False)
+    password = db.Column(db.String(300), nullable=False)
 
 
 class RegisterForm(FlaskForm):
@@ -92,8 +97,8 @@ def register():
     form= RegisterForm()
 
     if form.validate_on_submit():
-        hashed_password = bcrypt.generate_password_hash(form.password.data)
-        new_user = User(username=form.username.data, password=hashed_password)
+        hashed_password = bcrypt.generate_password_hash(form.password.data.encode('utf-8'))
+        new_user = User(username=form.username.data, password=hashed_password.decode('utf-8'))
         db.session.add(new_user)
         db.session.commit()
         return redirect(url_for('login'))
@@ -127,7 +132,6 @@ def index():
         poster_image=poster_image,
         wiki_url=wikipedia_url,
     )
-
 
 
 
