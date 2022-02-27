@@ -7,7 +7,6 @@ import base64
 from flask import Flask, render_template, url_for, redirect
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin,login_user, LoginManager, login_required, logout_user, current_user
-
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import InputRequired, Length, ValidationError
@@ -39,12 +38,23 @@ def load_user(user_id):
 
 
 
+#Table for username and password
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), nullable=False, unique=True)
     password = db.Column(db.String(300), nullable=False)
 
+#Table for movie id, comments and ratings
+class Comment(db.model):
+    id = db.Column(db.Integer, primary_key=True)
+    movid = db.Column(db.String(300), nullable=False)
+    comments = db.Column(db.String(300), nullable=False)
+    rating = db.Column(db.Integer(30), nullable=False)
 
+
+
+
+#Allows user to register using form
 class RegisterForm(FlaskForm):
     username = StringField(validators=[InputRequired(), Length(
         min=4, max=20)], render_kw={"placeholder": "Username"})
@@ -61,13 +71,14 @@ class RegisterForm(FlaskForm):
                 "Opps. Someone already has that username. Please choose a different one.")
 
 
-
+#Takes username and pw and compares 
 class LoginForm(FlaskForm):
     username = StringField(validators=[InputRequired(), Length(
         min=4, max=20)], render_kw={"placeholder": "Username"})
     password = PasswordField(validators=[ InputRequired(), Length(
         min=4, max=20)], render_kw={"placeholder": "Password"})
     submit = SubmitField("Login")
+
 
 
 
@@ -79,7 +90,7 @@ MOVIE_IDS = [
     16555
 ]
 
-
+#Login Users if account exists 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
     form = LoginForm()
@@ -92,6 +103,8 @@ def login():
     return render_template("login.html", form=form)
     
 
+
+#Register Users 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
     form= RegisterForm()
@@ -107,6 +120,7 @@ def register():
 
 
 
+#Logout user after done commenting and viewing site 
 @app.route("/logout", methods=['GET', 'POST'])
 @login_required
 def logout():
@@ -114,14 +128,14 @@ def logout():
     return redirect(url_for('login'))
     
 
-
+#Displays movies on website 
 @app.route("/", methods=['GET', 'POST'])
 @login_required
 def index():
     movie_id = random.choice(MOVIE_IDS)
 
     # API calls
-    (title, tagline, genre, poster_image) = get_movie_data(movie_id)
+    (movieid, title, tagline, genre, poster_image) = get_movie_data(movie_id)
     wikipedia_url = get_wiki_link(title)
 
     return render_template(
@@ -131,6 +145,7 @@ def index():
         genre=genre,
         poster_image=poster_image,
         wiki_url=wikipedia_url,
+        movieid=movieid,
     )
 
 
