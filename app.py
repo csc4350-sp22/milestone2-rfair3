@@ -1,3 +1,4 @@
+from errno import ERANGE
 from wsgiref.validate import validator
 import requests
 import os
@@ -23,8 +24,9 @@ bcrypt = Bcrypt(app)
 
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = 'thisisasecretkey'
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 
 
 login_manager = LoginManager()
@@ -45,13 +47,12 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(300), nullable=False)
 
 #Table for movie id, comments and ratings
-class Comment(db.model):
+class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     movid = db.Column(db.String(300), nullable=False)
+    userid = db.Column(db.String(300), nullable=False)
     comments = db.Column(db.String(300), nullable=False)
-    rating = db.Column(db.Integer(30), nullable=False)
-
-
+    rating = db.Column(db.Integer())
 
 
 #Allows user to register using form
@@ -78,8 +79,6 @@ class LoginForm(FlaskForm):
     password = PasswordField(validators=[ InputRequired(), Length(
         min=4, max=20)], render_kw={"placeholder": "Password"})
     submit = SubmitField("Login")
-
-
 
 
 MOVIE_IDS = [
@@ -148,6 +147,25 @@ def index():
         movieid=movieid,
     )
 
+@app.route("/reviews", methods=['GET', 'POST'])
+def review():
+    if Flask.request.method == "POST":
+        data = Flask.request.form
+        new_comment = Comment(
+            comments=data["comments"],
+            rating=data["rating"],
+            userid=data["userid"]
+        )
+        db.session.add(new_comment)
+        db.session.commit()
+
+    comments = Comment.query.all()
+    num_comments= len(comments)
+    return render_template(
+        "index.html",
+        num_comments=num_comments,
+        comments=comments
+        )
 
 
 if __name__ == "__main__":

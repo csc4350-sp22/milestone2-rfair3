@@ -1,0 +1,13 @@
+body {
+    background-color: #D35400;
+    text-align: center;
+    font-family: "Copperplate", Fantasy;
+}
+  
+  img {
+    border-radius: 25px;
+  }
+  
+  audio {
+    padding-bottom: 30px;
+  }
