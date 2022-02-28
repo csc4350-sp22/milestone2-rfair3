@@ -4,6 +4,7 @@ requests
 python-dotenv
 flask-login
 Flask-WTF
+Flask-SQLAlchemy
 WTForms
 bcrypt
 
