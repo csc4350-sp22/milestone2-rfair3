@@ -6,6 +6,6 @@ flask-login
 Flask-WTF
 Flask-SQLAlchemy
 WTForms
-bcrypt
+Flask-bcrypt
 
 
