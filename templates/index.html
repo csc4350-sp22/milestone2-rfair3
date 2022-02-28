@@ -18,19 +18,24 @@
 
 
 	<h2>What's Your Opinion?</h2>
-	<form method="POST" action="">
-		<label for="country">Movie ID:</label>
-		<input type="text" id="country" name="country" value={{movieid}} readonly><br><br>
-		<label for="userid">Username:</label>
-		<input type="text" name="userid" /><br><br>
+	<form method="POST" action=" ">
+		<label for="movieid">Movie ID:</label>
+		<input type="text" id="movieid" name="movieid" value={{movieid}} readonly><br><br>
+		<label for="username">Username:</label>
+		<input type="text" id="username" name="username" value={{username}} readonly><br><br>
 		<label for="rating">Rating (between 1 and 5):</label>
 		<input type="number" id="rating" name="rating" min="1" max="5"><br><br>
 		<label for="comments">Leave your comment here:</label><br><br>
 		<textarea id="comments" name="comments" rows="4" cols="50">
-		</textarea>
+			</textarea>
 		<br><br>
 		<input type="submit" value="Add your opinion!" />
 	</form>
+	<ol>
+	{% for i in range(num_comments) %}
+		<li><b>{{comments[i].movieid}}<br><br></b>; {{comments[i].username}}<br><br>; {{comments[i].rating}}<br><br>; {{comments[i].comments}}<br><br></li>
+	{% endfor %}
+	</ol>
 </body>
 
 </html>

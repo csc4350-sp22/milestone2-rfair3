@@ -1,9 +1,13 @@
-from errno import ERANGE
-from wsgiref.validate import validator
-import requests
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# pylint: disable=no-member
+"""
+this is a file 
+"""
 import os
 import random
-import base64
+import random
+import flask
 
 from flask import Flask, render_template, url_for, redirect
 from flask_sqlalchemy import SQLAlchemy
@@ -14,11 +18,14 @@ from wtforms.validators import InputRequired, Length, ValidationError
 from flask_bcrypt import Bcrypt
 from wikipedia import get_wiki_link
 from tmdb import get_movie_data
+from dotenv import load_dotenv, find_dotenv
+
+load_dotenv(find_dotenv())
 
 
 
 
-app = Flask(__name__)
+app = flask.Flask(__name__)
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 
@@ -36,7 +43,11 @@ login_manager.login_view = "login"
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
+    try:
+        return User.query.get(user_id)
+    except:
+        return None
+
 
 
 
@@ -49,10 +60,10 @@ class User(db.Model, UserMixin):
 #Table for movie id, comments and ratings
 class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    movid = db.Column(db.String(300), nullable=False)
-    userid = db.Column(db.String(300), nullable=False)
+    movieid = db.Column(db.String(300), nullable=False)
+    username = db.Column(db.String(300), nullable=False)
     comments = db.Column(db.String(300), nullable=False)
-    rating = db.Column(db.Integer())
+    rating =db.Column(db.String(300), nullable=False)
 
 
 #Allows user to register using form
@@ -99,7 +110,11 @@ def login():
             if bcrypt.check_password_hash(user.password, form.password.data):
                 login_user(user)
                 return redirect(url_for('index'))
-    return render_template("login.html", form=form)
+    return flask.render_template("login.html", form=form)
+
+
+   
+
     
 
 
@@ -115,7 +130,7 @@ def register():
         db.session.commit()
         return redirect(url_for('login'))
 
-    return render_template("register.html", form=form)
+    return flask.render_template("register.html", form=form)
 
 
 
@@ -132,12 +147,26 @@ def logout():
 @login_required
 def index():
     movie_id = random.choice(MOVIE_IDS)
-
+    username= current_user.username
     # API calls
     (movieid, title, tagline, genre, poster_image) = get_movie_data(movie_id)
     wikipedia_url = get_wiki_link(title)
+    if flask.request.method == "POST":
+        data = flask.request.form
+        new_comment = Comment(
+            comments=data["comments"],
+            username=data["username"],
+            movieid=data["movieid"],
+            rating=data["rating"]
+        )
+        db.session.add(new_comment)
+        db.session.commit()
 
-    return render_template(
+    comments = Comment.query.all()
+    num_comments = len(comments)
+
+    
+    return flask.render_template(
         "index.html",
         title=title,
         tagline=tagline,
@@ -145,27 +174,10 @@ def index():
         poster_image=poster_image,
         wiki_url=wikipedia_url,
         movieid=movieid,
-    )
-
-@app.route("/reviews", methods=['GET', 'POST'])
-def review():
-    if Flask.request.method == "POST":
-        data = Flask.request.form
-        new_comment = Comment(
-            comments=data["comments"],
-            rating=data["rating"],
-            userid=data["userid"]
-        )
-        db.session.add(new_comment)
-        db.session.commit()
-
-    comments = Comment.query.all()
-    num_comments= len(comments)
-    return render_template(
-        "index.html",
+        username=username,
         num_comments=num_comments,
-        comments=comments
-        )
+        comments=comments,
+    )
 
 
 if __name__ == "__main__":
