@@ -7,5 +7,6 @@ Flask-WTF
 Flask-SQLAlchemy
 WTForms
 Flask-bcrypt
+psycopg2
 
 
