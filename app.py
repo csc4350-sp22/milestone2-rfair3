@@ -9,16 +9,17 @@ import random
 import random
 import flask
 
-from flask import Flask, render_template, url_for, redirect
+from flask import url_for, redirect
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin,login_user, LoginManager, login_required, logout_user, current_user
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import InputRequired, Length, ValidationError
 from flask_bcrypt import Bcrypt
+from dotenv import load_dotenv, find_dotenv
 from wikipedia import get_wiki_link
 from tmdb import get_movie_data
-from dotenv import load_dotenv, find_dotenv
+
 
 load_dotenv(find_dotenv())
 
@@ -74,22 +75,21 @@ class Comment(db.Model):
 class RegisterForm(FlaskForm):
     username = StringField(validators=[InputRequired(), Length(
         min=4, max=20)], render_kw={"placeholder": "Username"})
-    password = PasswordField(validators=[ InputRequired(), Length(
+    password = PasswordField(validators=[InputRequired(), Length(
         min=4, max=20)], render_kw={"placeholder": "Password"})
     submit = SubmitField("Register")
 
 
-    def validate_username(self, username):
+    def validate_username(self,username):
         existing_user_username = User.query.filter_by(
             username=username.data).first()
         if existing_user_username:
             raise ValidationError(
                 "Opps. Someone already has that username. Please choose a different one.")
 
-
 #Takes username and pw and compares 
 class LoginForm(FlaskForm):
-    username = StringField(validators=[InputRequired(), Length(
+    username=StringField(validators=[InputRequired(), Length(
         min=4, max=20)], render_kw={"placeholder": "Username"})
     password = PasswordField(validators=[ InputRequired(), Length(
         min=4, max=20)], render_kw={"placeholder": "Password"})

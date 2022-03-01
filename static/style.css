@@ -11,3 +11,6 @@ img {
 audio {
   padding-bottom: 30px;
 }
+hr.solid {
+  border-top: 1px solid black;
+}

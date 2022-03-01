@@ -30,10 +30,22 @@
 			</textarea>
 		<br><br>
 		<input type="submit" value="Add your opinion!" />
+		<br><br>
 	</form>
-	<ol>
+	<h2>See What Others Think:</h2>
+	<ol style="list-style: none;">
 	{% for i in range(num_comments) %}
-		<li><b>{{comments[i].movieid}}<br><br></b>; {{comments[i].username}}<br><br>; {{comments[i].rating}}<br><br>; {{comments[i].comments}}<br><br></li>
+		<li>
+			<label for="movieid">Movie ID:</label>
+			{{comments[i].movieid}}<br><br> 
+			<label for="username">Username:</label>
+			{{comments[i].username}}<br><br> 
+			<label for="rating">Rating (between 1 and 5):</label>
+			{{comments[i].rating}}<br><br> 
+			<label for="comments">Their Opinion:</label>
+			{{comments[i].comments}}<br><br>
+			<hr class="solid">
+		</li>
 	{% endfor %}
 	</ol>
 </body>
